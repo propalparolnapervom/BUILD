@@ -1,0 +1,1101 @@
+            APACHE ANT
+
+
+
+
+# ANT: overall info
+
+  #http://www.tutorialspoint.com/ant/ant_introduction.htm
+  #ANT stands for Another Neat Tool.
+  #It is an OS build and deployment tool that can be executed from the 
+  command line.
+
+  #http://ant.apache.org/manual/index.html
+  #Apache Ant is a Java-based build tool. In theory, it is kind of like make, without 
+  make's wrinkles.
+  #Ant is different. Instead of a model where it is extended with shell-based commands, 
+  Ant is extended using Java classes. Instead of writing shell commands, the configuration 
+  files are XML-based, calling out a target tree where various tasks get executed. Each 
+  task is run by an object that implements a particular Task interface.
+
+  #http://ant.apache.org/
+  #Apache Ant is a Java library and command-line tool whose mission is to drive processes   
+  described in build files as targets and extension points dependent upon each other. 
+
+  #The main known usage of Ant is the build of Java applications. Ant supplies a number of 
+  built-in tasks allowing to compile, assemble, test and run Java applications. Ant can 
+  also be used effectively to build non Java applications, for instance C or C++ applicati
+  ons. More generally, Ant can be used to pilot any type of process which can be described 
+  in terms of targets and tasks.
+
+  #Ant is written in Java. Users of Ant can develop their own "antlibs" containing Ant 
+  tasks and types, and are offered a large number of ready-made commercial or open-source 
+  "antlibs".
+
+
+
+
+# INSTALL: all
+
+  #http://www.tutorialspoint.com/ant/ant_environment.htm
+  #http://ant.apache.org/manual/index.html
+  
+  #Download java (if didn't do this earlier)
+http://www.oracle.com/technetwork/java/javase/downloads/index.html
+export JAVA_HOME=...
+export PATH=$JAVA_HOME/bin:$PATH
+java -version
+
+  #Ensure that the JAVA_HOME environment variable is set to the folder where your JDK is 
+  installed.
+export JAVA_HOME=/u01/install/zip/java/jdk1.8.0_60
+
+  #Download the binaries from http://ant.apache.org
+
+  #Unzip the zip file to a convenient location c:\folder. using Winzip, winRAR, 7-zip or 
+  similar tools.
+unzip apache-ant-1.9.6-bin.zip -d ../../unzip/ant
+ 
+  #Create a new environment variable called ANT_HOME that points to the Ant installation 
+  folder, in this case c:\apache-ant-1.8.2-bin folder.
+export ANT_HOME=/u01/install/unzip/ant/apache-ant-1.9.6
+
+  #Append the path to the Apache Ant batch file to the PATH environment variable. In our 
+  case this would be the c:\apache-ant-1.8.2-bin\bin folder
+export PATH=$JAVA_HOME/bin/:/usr/bin:/usr/sbin:$ANT_HOME/bin:$PATH
+
+  #Can create enviroment file with all above:
+vi ~/ant.env  
+export JAVA_HOME=/u01/install/zip/java/jdk1.8.0_60
+export ANT_HOME=/u01/install/unzip/ant/apache-ant-1.9.6
+export PATH=$JAVA_HOME/bin/:/usr/bin:/usr/sbin:$ANT_HOME/bin:$PATH
+
+
+
+
+# VARIABLES: include env variables
+
+    #Include XNG_LIB variable into ant file
+    
+<property environment="env"/>
+<property name="lib" location="${env.XNG_LIB}"/>
+
+
+
+
+# VERSION: view
+
+ant -version
+  Apache Ant(TM) version 1.9.6 compiled on June 29 2015
+
+
+
+
+
+# BUILD FILES: overall info
+
+  #http://www.tutorialspoint.com/ant/ant_build_files.htm
+
+  #Typically, Ant's build file, called build.xml should reside in the base directory of 
+  the project. However there is no restriction on the file name or its location. You are 
+  free to use other file names or save the build file in some other location.
+
+  #For this exercise, create a file called build.xml anywhere in your computer with the 
+  following contents in it:
+  
+<?xml version="1.0"?>
+   <project name="Hello World Project" default="info">
+   
+   <target name="info">
+      <echo>Hello World - Welcome to Apache Ant!</echo>
+   </target>
+   
+</project>
+
+  #All build files require the project element and at least one target element.
+
+  #The XML element project has three attributes :
+      Attributes      Description
+      name	          The Name of the project. (Optional)
+      default	    The default target for the build script. A project may contain any       
+                      number of targets. This attribute specifies which target should be 
+                      considered as the default. (Mandatory)
+      basedir	    The base directory (or) the root folder for the project. (Optional)
+
+  #A TARGET is a collection of tasks that you want to run as one unit. In our example, we 
+  have a simple target to provide an informational message to the user.
+
+  #Targets can have dependencies on other targets. For example, a deploy target may have a 
+  dependency on the package target, the package target may have a dependency on the 
+  compile target and so forth. Dependencies are denoted using the depends attribute. For 
+  example:
+
+<target name="deploy" depends="package">
+  ....
+</target>
+
+<target name="package" depends="clean,compile">
+  ....
+</target>
+
+<target name="clean" >
+  ....
+</target>
+
+<target name="compile" >
+  ....
+</target>
+  
+  #The target element has the following attributes:
+      Attributes      Description
+      name	          The name of the target (Required)
+      depends	    Comma separated list of all targets that this target depends on. 
+                      (Optional)
+      description	    A short description of the target. (optional)
+      if              Allows the execution of a target based on the trueness of a 
+                      conditional attribute. (optional)
+      unless	    Adds the target to the dependency list of the specified Extension  
+                      Point. An Extension Point is similar to a target, but it does not 
+                      have any tasks. (Optional)
+
+  #The echo task in the above example is a trivial task that prints a message. In our 
+  example, it prints the message Hello World.
+
+
+  
+  
+# BUILD FILES: examples
+
+  #http://www.tutorialspoint.com/ant/ant_build_files.htm
+
+
+  #SIMPLE OUTPUT
+  
+    #1) At SOME_DIR create file:
+vi build.xml
+<?xml version="1.0"?>
+   <project name="Hello World Project" default="info">
+
+   <target name="info">
+      <echo>Hello World - Welcome to Apache Ant!</echo>
+   </target>
+
+   <target name="burt">
+      <echo>Hello Burt!</echo>
+   </target>
+
+</project>
+
+    #2) cd SOME_DIR
+cd SOME_DIR
+  
+    #3) build file
+ant info   #OR   ant   (build target that default - "info" in out case)
+      Buildfile: /u01/projects/ant/build.xml
+      info:
+           [echo] Hello World - Welcome to Apache Ant!
+      BUILD SUCCESSFUL
+      Total time: 0 seconds
+
+ant burt
+      Buildfile: /u01/projects/ant/build.xml
+      burt:
+           [echo] Hello Burt!
+      BUILD SUCCESSFUL
+      Total time: 0 seconds
+
+
+  #SIMPLE OUTPUT (with dependies)
+
+    #Create file build.xml
+vi build.xml
+<?xml version="1.0"?>
+   <project name="Project BURT" default="start">
+
+   <target name="start" depends="middle">
+      <echo> Start! </echo>
+   </target>
+
+   <target name="middle" depends="preend,end">
+      <echo> Middle! </echo>
+   </target>
+   
+   <target name="preend">
+      <echo> Pre-End! </echo>
+   </target>
+   
+   <target name="end">
+      <echo> End! </echo>
+   </target>
+
+</project>
+  
+    #Build file
+ant start
+      Buildfile: /u01/projects/ant/build.xml
+      preend:
+           [echo]  Pre-End!
+      end:
+           [echo]  End!
+      middle:
+           [echo]  Middle!
+      start:
+           [echo]  Start!
+      BUILD SUCCESSFUL
+      Total time: 0 seconds
+  
+  
+  
+  
+# VARIABLES (MANUAL - PROPERTY TASK): overall info
+
+  #http://www.tutorialspoint.com/ant/ant_property_task.htm
+
+  #Ant build files are written in XML, which does not allow declaring variables as you do 
+  in your favorite programming language. However, as you may have imagined, it would be 
+  useful if Ant allowed declaring variables such as project name, project source directory
+  , etc.
+
+  #Ant uses the property element which allows you to specify properties. This allows the 
+  properties to be changed from one build to another or from one environment to another.
+
+  #By default, Ant provides the following pre-defined properties that can be used in the build file:
+
+      Properties                       Description
+      ant.file	                     The full location of the build file.
+      ant.version	                     The version of the Apache Ant installation.
+      basedir	                     The basedir of the build, as specified in the 
+                                       basedir attribute of the project element.
+      ant.java.version	               The version of the JDK that is used by Ant.
+      ant.project.name	               The name of the project, as specified in the name 
+                                       atrribute of the project element.
+      ant.project.default-target	   The default target of the current project.
+      ant.project.invoked-targets	   Comma separated list of the targets that were 
+                                       invoked in the current project.
+      ant.core.lib	               The full location of the Ant jar file.
+      ant.home	                     The home directory of Ant installation.
+      ant.library.dir	               The home directory for Ant library files - 
+                                       typically ANT_HOME/lib folder.
+
+  #View variable
+...
+<echo>Apache Ant version is ${ant.version} </echo>
+...
+
+  #In addition to the above, the user can define additional properties using the property   
+  element. The following example shows how to define a property called sitename:  
+...
+<property name="sitename" value="www.tutorialspoint.com"/>
+...
+
+
+
+
+# VARIABLES (MANUAL - PROPERTY TASK): examples
+
+  #http://www.tutorialspoint.com/ant/ant_property_task.htm
+  #SIMPLE OUTPUT (with standart and user variables)
+
+    #Create file build.xml
+vi build.xml
+<?xml version="1.0"?>
+<project name="Project BURT" default="info">
+
+   <property name="sitename" value="www.burt.com"/>
+
+   <target name="info">
+      <echo>Location of the Ant jar file: ${ant.core.lib}   </echo>
+      <echo>Apache Ant version is ${ant.version} - You are at ${sitename} </echo>
+   </target>
+
+</project>
+  
+    #Build file
+ant
+      Buildfile: /u01/projects/ant/build.xml
+      info:
+           [echo] Location of the Ant jar file: /u01/install/unzip/ant/apache-ant-1.9.6
+           /lib/ant.jar
+           [echo] Apache Ant version is Apache Ant(TM) version 1.9.6 compiled on June 29 
+           2015 - You are at www.burt.com
+      BUILD SUCCESSFUL
+      Total time: 0 seconds
+
+
+
+
+# VARIABLES (SEPARATE FILE - PROPERTY FILES): overall info
+
+  #http://www.tutorialspoint.com/ant/ant_property_files.htm
+  #Setting properties directly in the build file is fine, if you are working with a 
+  handful of properties. However, for a large project, it makes sense to store the 
+  properties in a separate property file.
+
+  #There is no hard and fast rule, but typically the property file is named build.properti
+  es and is placed along-side the build.xml file. You could create multiple build 
+  properties files based on the deployment environments - such as build.properties.dev and 
+  build.properties.test.
+
+  #The contents of the build property file are similar to the normal java property file. 
+  They contain one property per line. Each property is represented by a name and a value 
+  pair. The name and value pairs are separated by an equals (=) sign. It is highly 
+  recommended that the properties are annotated with proper comments. Comments are listed 
+  using the hash (#) character.
+
+  #Just include in build.xml link to your property file ...
+...
+<property file="build.properties"/>
+...
+  #... which looks like
+# The Site Name
+sitename=www.tutorialspoint.com
+
+  #In addition to the above, Ant comes with a number of predefined build properties, which 
+  are listed in the previous section, but is represented below once again.
+
+      Properties                      Description
+      ant.file	                    The full location of the build file.
+      ant.version	                    The version of the Apache Ant installation.
+      basedir	                    The basedir of the build, as specified in the 
+                                      basedir attribute of the project element.
+      ant.java.version	              The version of the JDK that is used by Ant.
+      ant.project.name	              The name of the project, as specified in the name 
+                                      atrribute of the project element.
+      ant.project.default-target	  The default target of the current project.
+      ant.project.invoked-targets	  Comma separated list of the targets that were 
+                                      invoked in the current project.
+      ant.core.lib	              The full location of the Ant jar file.
+      ant.home	                    The home directory of Ant installation.
+      ant.library.dir	              The home directory for Ant library files - typically 
+                                      ANT_HOME/lib folder.
+
+
+
+
+# VARIABLES (SEPARATE FILE - PROPERTY FILES): examples
+
+  #http://www.tutorialspoint.com/ant/ant_property_files.htm
+  #SIMPLE OUTPUT (with variables via property file)
+    #Create file build.xml
+vi build.xml
+<?xml version="1.0"?>
+<project name="Project BURT" default="info">
+
+   <property file="build.properties"/>
+
+   <target name="info">
+      <echo>Product build is: ${buildversion}   </echo>
+      <echo>Apache Ant version is ${ant.version} - You are at ${sitename} </echo>
+   </target>
+
+</project>
+
+    #Create his property file
+vi build.properties
+# The Site Name
+sitename=www.burt.com
+# The Build of Product
+buildversion=3.3.2
+
+    #Build file
+ant
+      Buildfile: /u01/projects/ant/build.xml
+      info:
+           [echo] Product build is: 3.3.2
+           [echo] Apache Ant version is Apache Ant(TM) version 1.9.6 compiled on June 29 
+           2015 - You are at www.burt.com
+      BUILD SUCCESSFUL
+      Total time: 0 seconds
+
+
+
+
+# DATA TYPES: overall info
+
+  #http://www.tutorialspoint.com/ant/ant_data_types.htm
+
+  #Ant provides a number of predefined data types - a set of services that are built into 
+  the product already (not like in programming language).
+
+  #The following data types are provided by Apache Ant:
+
+  #1) Fileset
+    #Represents a collection of files. 
+    Used as a filter to include or exclude files that match a particular pattern.
+
+    #For example, refer the following code. 
+    #Here, the src attribute points to the source folder of the project.
+    #The fileset selects all .java files in the source folder except those contain the 
+    word 'Stub'. The case-sensitive filter is applied to the fileset which means a file 
+    with the name Samplestub.java will not be excluded from the fileset.
+
+<fileset dir="${src}" casesensitive="yes">
+   <include name="**/*.java"/>
+   <exclude name="**/*Stub*"/>
+</fileset>
+
+
+  #2) Pattern set
+    #Pattern that allows to filter files or folders easily based on certain patterns. 
+    Patterns can be created using the following meta characters:
+      ? - Matches one character only.
+      * - Matches zero or many characters.
+      ** - Matches zero or many directories recursively.
+
+    #The following example depicts the usage of a pattern set.
+<patternset id="java.files.without.stubs">
+   <include name="src/**/*.java"/>
+   <exclude name="src/**/*Stub*"/>
+</patternset>
+
+    #The patternset can then be reused with a fileset as follows:
+<fileset dir="${src}" casesensitive="yes">
+   <patternset refid="java.files.without.stubs"/>
+</fileset>
+
+
+  #3) File list
+    #Similar to the file set except the following differences:
+      - filelist contains explicitly named lists of files and it does not support wild 
+      cards.
+      - filelist data type can be applied for existing or non-existing files.
+
+    #For example, the attribute webapp.src.folder points to the web application source 
+    folder of the project.
+<filelist id="config.files" dir="${webapp.src.folder}">
+   <file name="applicationConfig.xml"/>
+   <file name="faces-config.xml"/>
+   <file name="web.xml"/>
+   <file name="portlet.xml"/>
+</filelist>
+
+
+  #4) Filter set
+    #Using a filterset data type along with the copy task, you can replace certain text in 
+    all files that matches the pattern with a replacement value.
+
+    #A common example is to append the version number to the release notes file, as shown 
+    in the following code.
+<copy todir="${output.dir}">
+   <fileset dir="${releasenotes.dir}" includes="**/*.txt"/>
+   <filterset>
+      <filter token="VERSION" value="${current.version}"/>
+   </filterset>
+</copy>
+
+    #In this Code:
+      - The attribute output.dir points to the output folder of the project.
+      - The attribute releasenotes.dir points to the release notes folder of the project.
+      - The attribute current.version points to the current version folder of the project.
+      - The copy task, as the name suggests, is used to copy files from one location to 
+      another.
+      
+      
+  #5) Path
+    #Commonly used to represent a class-path. Entries in the path 
+    are separated using semicolons or colons. However, these characters are replaced at 
+    the run-time by the executing system's path separator character.
+
+    #The classpath is set to the list of jar files and classes in the project, as shown in 
+    the example below.
+<path id="build.classpath.jar">
+   <pathelement path="${env.J2EE_HOME}/${j2ee.jar}"/>
+   <fileset dir="lib">
+      <include name="**/*.jar"/>
+   </fileset>
+</path>
+
+    #In this code:
+      - The attribute env.J2EE_HOME points to the environment variable J2EE_HOME.
+      - The attribute j2ee.jar points to the name of the J2EE jar file in the J2EE base 
+      folder.      
+
+
+
+
+# BUILDING PROJECTS: overall info
+
+  #http://www.tutorialspoint.com/ant/ant_build_project.htm
+  #The aim of this chapter is to build an Ant file that compiles the java classes and 
+  places them in the WEB-INF\classes folder.
+  
+  #Consider the following project structure:
+      The database scripts are stored in the db folder.
+      The java source code is stored in the src folder.
+      The images, js, META-INF, styles (css) are stored in the war folder.
+      The JSPs are stored in the jsp folder.
+      The third party jar files are stored in the lib folder.
+      The java class files are stored in the WEB-INF\classes folder.
+
+  #This project forms the Hello World Fax Application for the rest of this tutorial.
+C:\work\FaxWebApplication>tree
+Folder PATH listing
+Volume serial number is 00740061 EC1C:ADB1
+C:.
++---db
++---src
+.  +---faxapp
+.  +---dao
+.  +---entity
+.  +---util
+.  +---web
++---war
+   +---images
+   +---js
+   +---META-INF
+   +---styles
+   +---WEB-INF
+      +---classes
+      +---jsp
+      +---lib
+
+  #Here is the build.xml required for this project. Let us consider it piece by piece.
+<?xml version="1.0"?>
+<project name="fax" basedir="." default="build">
+   <property name="src.dir" value="src"/>
+   <property name="web.dir" value="war"/>
+   <property name="build.dir" value="${web.dir}/WEB-INF/classes"/>
+   <property name="name" value="fax"/>
+
+   <path id="master-classpath">
+      <fileset dir="${web.dir}/WEB-INF/lib">
+         <include name="*.jar"/>
+      </fileset>
+      <pathelement path="${build.dir}"/>
+   </path>
+
+   <target name="build" description="Compile source tree java files">
+      <mkdir dir="${build.dir}"/>
+      <javac destdir="${build.dir}" source="1.5" target="1.5">
+         <src path="${src.dir}"/>
+         <classpath refid="master-classpath"/>
+      </javac>
+   </target>
+ 
+   <target name="clean" description="Clean output directories">
+      <delete>
+         <fileset dir="${build.dir}">
+            <include name="**/*.class"/>
+         </fileset>
+      </delete>
+   </target>
+</project>  
+  
+
+  #The clean target, as the name suggests, deletes the files in the build folder.
+<target name="clean" description="Clean output directories">
+   <delete>
+      <fileset dir="${build.dir}">
+         <include name="**/*.class"/>
+      </fileset>
+   </delete>
+</target>
+
+  #The master-classpath holds the classpath information. In this case, it includes the 
+  classes in the build folder and the jar files in the lib folder.
+<path id="master-classpath">
+   <fileset dir="${web.dir}/WEB-INF/lib">
+      <include name="*.jar"/>
+   </fileset>
+   <pathelement path="${build.dir}"/>
+</path>
+
+  #Finally, the build target to build the files. First of all, we create the build 
+  directory, if it does not exist. Then we execute the javac command (specifying jdk1.5 as 
+  our target compilation). We supply the source folder and the classpath to the javac task 
+  and ask it to drop the class files in the build folder.
+<target name="build" description="Compile main source tree java files">
+   <mkdir dir="${build.dir}"/>
+   <javac destdir="${build.dir}" source="1.5" target="1.5" debug="true"
+      deprecation="false" optimize="false" failonerror="true">
+      <src path="${src.dir}"/>
+      <classpath refid="master-classpath"/>
+   </javac>
+</target>
+  
+  #Executing Ant on this file compiles the java source files and places the classes in       
+  the build folder  
+  
+  #The files are compiled and placed in the build.dir folder.
+
+
+
+
+# BUILD DOCUMENTATION: overall info 
+
+  #http://www.tutorialspoint.com/ant/ant_build_documentation.htm
+  #Documentation is a must in any project. Documentation plays a great role in the 
+  maintenance of a project. Java makes documentation easier by the use of the in-built 
+  javadoc tool. Ant makes it even easier by generating the documentation on demand.
+  
+  
+  #Attributes
+  
+  #Source can be specified using sourcepath, sourcepathref or sourcefiles.
+      - sourcepath is used to point to the folder of the source files (e.g. src folder).
+      - sourcepathref is used to refer a path that is referenced by the path attribute (e
+      .g, delegates.src.dir).
+      - sourcefiles is used when you want to specify the individual files as a comma 
+      separated list.
+
+  #Destination path is specified using the destdir folder (e.g build.dir).
+  #You could filter the javadoc task by specifying the package names to be included. This 
+  is achieved by using the packagenames attribute, a comma separated list of package files
+  #You could filter the javadoc process to show only the public, private, package, or 
+  protected classes and members. This is achieved by using the private, public, package 
+  and protected attributes.
+  #You could also tell the javadoc task to include the author and version information 
+  using the respective attributes.
+  #You could also group the packages together using the group attribute, so that it 
+  becomes easy to navigate.
+
+
+  #Putting it all together
+  
+  #Let us continue our theme of the Hello world Fax application. Let us add a documentatio  
+  n target to our Fax application project.
+
+  #Given below is an example javadoc task used in our project. In this example, we have 
+  specified the javadoc to use the src.dir as the source directory, and doc as the target.
+  #We have also customized the window title, the header, and the footer information that  
+  appear on the java documentation pages.
+  #Also, we have created three groups:
+      - one for the utility classes in our source folder,
+      - one for the user interfaces classes, and
+      - one for the database related classes.
+  #You may notice that the data package group has two packages -– faxapp.entity and faxapp
+  .dao.
+
+<target name = "generate-javadoc">
+   <javadoc packagenames="faxapp.*" sourcepath="${src.dir}" 
+      destdir = "doc" version = "true" windowtitle = "Fax Application">
+      
+      <doctitle><![CDATA[= Fax Application =]]></doctitle>
+      
+      <bottom>
+         <![CDATA[Copyright © 2011. All Rights Reserved.]]>
+      </bottom>
+      
+      <group title = "util packages" packages = "faxapp.util.*"/>
+      <group title = "web packages" packages = "faxapp.web.*"/>
+      <group title = "data packages" packages = "faxapp.entity.*:faxapp.dao.*"/>
+   </javadoc>
+   
+   <echo message = "java doc has been generated!" />
+</target>
+
+  #Let us execute the javadoc Ant task. It generates and places the java documentation 
+  files in the doc folder.
+
+  #When the javadoc target is executed, it produces the following outcome:
+C:\>ant generate-javadoc
+Buildfile: C:\build.xml
+java doc has been generated!
+BUILD SUCCESSFUL
+Total time: 10.63 second
+
+  #The java documentation files are now present in the doc folder.
+  #Typically, the javadoc files are generated as a part of the release or package targets.
+
+
+  
+  
+# CREATING JAR FILES: overall info
+
+  #http://www.tutorialspoint.com/ant/ant_creating_jar_files.htm
+  #The next logical step after compiling your java source files, is to build the java 
+  archive, i.e., the JAR file. Creating JAR files with Ant is quite easy with the jar task
+  . The commonly used attributes of the jar task are as follows:
+  
+      Attributes              Description
+      ----------              -----------
+      basedir	            The base directory for the output JAR file. By default, this             
+                              is set to the base directory of the project.
+      compress	            Advises Ant to compress the file as it creates the JAR file.
+      keepcompression	      While the compress attribute is applicable to the individual 
+                              files, the keepcompression attribute does the same thing, 
+                              but it applies to the entire archive.
+      destfile	            The name of the output JAR file.
+      duplicate	            Advises Ant on what to do when duplicate files are found. 
+                              You could add, preserve, or fail the duplicate files.
+      excludes	            Advises Ant to not include these comma separated list of 
+                              files in the package.
+      excludesfile	      Same as above, except the exclude files are specified using 
+                              a pattern.
+      inlcudes	            Inverse of excludes.
+      includesfile	      Inverse of excludesfile.
+      update	            Advises Ant to overwrite files in the already built JAR file
+  
+
+<target name="build-jar">
+   <jar destfile="${web.dir}/lib/util.jar"
+      basedir="${build.dir}/classes"
+      includes="faxapp/util/**"
+      excludes="**/Test.class">
+
+      <manifest>
+         <attribute name="Main-Class" value="com.tutorialspoint.util.FaxUtil"/>
+      </manifest>
+
+   </jar>
+</target>
+
+
+
+
+# CREATING WAR FILES: overall info
+
+  #http://www.tutorialspoint.com/ant/ant_creating_war_files.htm
+
+<target name="build-war">
+
+   <war destfile="fax.war" webxml="${web.dir}/web.xml">
+      <fileset dir="${web.dir}/WebContent">
+         <include name="**/*.*"/>
+      </fileset>
+      
+      <lib dir="thirdpartyjars">
+         <exclude name="portlet.jar"/>
+      </lib>
+      
+      <classes dir="${build.dir}/web"/>
+   </war>
+   
+</target>
+
+
+
+
+# PACKAGING APPLICATIONS: overall info
+  
+  #http://www.tutorialspoint.com/ant/ant_packaging_applications.htm
+  #Now it is time to put everything together to create a full and complete build.xml file. 
+  Consider build.properties and build.xml files as follows:
+
+  #build.properties
+vi build.properties
+deploy.path = c:\tomcat6\webapps
+
+  #build.xml
+vi build.xml
+<?xml version = "1.0"?>
+
+<project name = "fax" basedir = "." default = "usage">
+
+   <property file = "build.properties"/>
+   <property name = "src.dir" value = "src"/>
+   <property name = "web.dir" value = "war"/>
+   <property name = "javadoc.dir" value = "doc"/>
+   <property name = "build.dir" value = "${web.dir}/WEB-INF/classes"/>
+   <property name = "name" value = "fax"/>
+
+   <path id = "master-classpath">
+      <fileset dir = "${web.dir}/WEB-INF/lib">
+         <include name = "*.jar"/>
+      </fileset>
+      <pathelement path = "${build.dir}"/>
+   </path>
+    
+   <target name = "javadoc">
+      <javadoc packagenames = "faxapp.*" sourcepath = "${src.dir}" 
+         destdir = "doc" version = "true" windowtitle = "Fax Application">
+         
+         <doctitle><![CDATA[<h1> =  Fax Application  = </h1>]]>
+         </doctitle>
+
+         <bottom><![CDATA[Copyright © 2011. All Rights Reserved.]]>
+         </bottom>
+
+         <group title = "util packages" packages = "faxapp.util.*"/>
+         <group title = "web packages" packages = "faxapp.web.*"/> 
+         <group title = "data packages" packages = "faxapp.entity.*:faxapp.dao.*"/>
+      </javadoc>
+   </target>
+
+   <target name = "usage">
+      <echo message = ""/>
+      <echo message = "${name} build file"/>
+      <echo message = "-----------------------------------"/>
+      <echo message = ""/>
+      <echo message = "Available targets are:"/>
+      <echo message = ""/>
+      <echo message = "deploy    --> Deploy application as directory"/>
+      <echo message = "deploywar --> Deploy application as a WAR file"/>
+      <echo message = ""/>
+   </target>
+
+   <target name = "build" description = "Compile main source tree java files">
+      <mkdir dir = "${build.dir}"/>
+      
+      <javac destdir = "${build.dir}" source = "1.5" target = "1.5" debug = "true"
+         deprecation = "false" optimize = "false" failonerror = "true">
+         
+         <src path = "${src.dir}"/>
+         <classpath refid = "master-classpath"/>
+         
+      </javac>
+   </target>
+
+
+   <target name = "deploy" depends = "build" description = "Deploy application">
+      <copy todir = "${deploy.path}/${name}" preservelastmodified = "true">
+
+         <fileset dir = "${web.dir}">
+            <include name = "**/*.*"/>
+         </fileset>
+
+      </copy>
+   </target>
+
+
+   <target name = "deploywar" depends = "build" description = "Deploy application as a WAR file">
+   
+      <war destfile = "${name}.war" webxml = "${web.dir}/WEB-INF/web.xml">
+         <fileset dir = "${web.dir}">
+            <include name = "**/*.*"/>
+         </fileset>
+      </war>
+      
+      <copy todir = "${deploy.path}" preservelastmodified = "true">
+         <fileset dir = ".">
+            <include name = "*.war"/>
+         </fileset>
+      </copy>
+      
+   </target>
+    
+
+   <target name = "clean" description = "Clean output directories">
+      <delete>
+         <fileset dir = "${build.dir}">
+            <include name = "**/*.class"/>
+         </fileset>
+      </delete>
+   </target>
+   
+</project>
+  
+      - We first declare the path to the webapps folder in Tomcat in the build properties 
+      file as the deploy.path variable.
+      - We also declare the source folder for the java files in the src.dir variable.
+      - Then we declare the source folder for the web files in the web.dir variable. 
+      javadoc.dir is the folder for storing the java documentation, and build.dir is the 
+      path for storing the build output files.
+      - Then we declare the name of the web application, which is fax in our case.
+      - We also define the master class path which contains the JAR files present in the 
+      WEB-INF/lib folder of the project.
+      - We also include the class files present in the build.dir in the master class path.
+      - The Javadoc target produces the javadoc required for the project and the usage 
+      target is used to print the common targets that are present in the build file.
+
+  #The deploy target copies the files from the web directory to the deploy directory 
+  preserving the last modified date time stamp. This is useful when deploying to a server 
+  that supports hot deployment.
+  #The clean target clears all the previously built files.
+  #The deploywar target builds the war file and then copies the war file to the deploy 
+  directory of the application server.
+
+
+
+
+# TIME FORMAT: how
+
+    <target name="display.build" depends="check-ant-version, warn-ant-version">
+        <tstamp prefix="built-on">
+            <format property="BUILD" pattern="E MMMM dd, yyyy KK:mm aa" locale="en"/>
+        </tstamp>
+        <echo message="Starting build on ${built-on.BUILD}"/>
+    </target>
+
+
+
+
+# COMMENTS: how
+
+<!-- We need the Catalina jars for Tomcat -->
+
+ 
+  
+
+# EXAMPLE1
+
+    #Include XML file
+    
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE project[
+        <!ENTITY properties SYSTEM "properties.xml">
+        ]>
+...
+
+
+
+
+# DEBUG: how to increase output
+
+    #Use "-v" key
+    
+ant -v build.xml
+
+
+  
+  
+# EXAMPLE2
+
+    #Script for copiing files
+    
+<project name="load-third-party" default="load-third-party" basedir="projects/common-utility"> &properties;
+    &properties;
+    <macrodef name="copy3">
+        <attribute name="file"/>
+        <attribute name="to"/>
+        <!-- no directory - just the jar name -->
+        <sequential>
+            <copy file="@{file}" tofile="${third-party}/@{to}" overwrite="false" flatten="true" verbose="true"
+                  preservelastmodified="true"/>
+        </sequential>
+    </macrodef>
+    <target name="load-third-party">
+
+        <!-- __________________________________________________________ -->
+        <!-- these are in alpha order, by destination ("to") jar name.  -->
+        <!-- __________________________________________________________ -->
+
+        <copy3 file="${ACTIVATION-JAR}" to="activation.jar"/>
+        <copy3 file="${AXIS-1.4-AXIS-JAR}" to="axis.jar"/>
+        <copy3 file="${CASTOR-XML-JAR}" to="castor-xml.jar"/>
+        <copy3 file="${CASTOR-1.2-XML-JAR}" to="castor-1.2-xml.jar"/>
+
+    </target>
+</project>
+
+
+
+
+# EXAMPLE3
+
+    #If
+    
+...
+    <target name="descriptordir.check">
+        <available file="${descriptordir}" property="descriptordir.present"/>
+    </target>
+...
+<target name="create-metadir" depends="descriptordir.check" if="descriptordir.present">
+        <mkdir dir="${destdir}"/>
+    </target>
+
+  
+
+
+# EXAMPLE4  
+
+    #OR
+    
+    <target name="check-ant-version">
+        <condition property="is-ant-correct-version">
+            <or>
+                <contains string="${ant.version}" substring="1.8.3"/>
+                <contains string="${ant.version}" substring="1.8.4"/>
+                <contains string="${ant.version}" substring="1.10.1"/>
+            </or>
+        </condition>
+        <!--<fail unless="is-ant-correct-version" message="Wrong version ('${ant.version}') of ant: use 1.7.* or 1.8.* or 1.10.*"/>-->
+    </target>  
+  
+  
+  
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
